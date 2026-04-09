@@ -20,11 +20,19 @@ public class OperatorTerminal {
         this.scanner = scanner;
     }
 
+    private static final String OPERATOR_PASSWORD = "operator123";
+
     /**
-     * Start an operator session.
+     * Start an operator session. Requires password authentication.
      */
     public void startSession() {
-        System.out.println("Operator logged in.");
+        System.out.print("Enter operator password: ");
+        String password = scanner.nextLine().trim();
+        if (!OPERATOR_PASSWORD.equals(password)) {
+            System.out.println("Invalid password. Access denied.");
+            return;
+        }
+        System.out.println("Operator login validated.");
         sessionMenu();
     }
 

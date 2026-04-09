@@ -18,8 +18,9 @@ Thumbs.db
 
 # Generated reports
 *.txt
-!UserManual.md
-!SubmissionGuide.md
+
+# Persistent data files
+data/
 
 # Generated docs (will be added separately)
 doc/

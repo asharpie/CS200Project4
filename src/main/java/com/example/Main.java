@@ -21,7 +21,10 @@ public class Main {
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        loadSampleData();
+        boolean loaded = DataPersistence.loadAll(memberDb, providerDb, serviceDir, recordDb);
+        if (!loaded) {
+            loadSampleData();
+        }
         reportGenerator = new ReportGenerator(memberDb, providerDb, serviceDir, recordDb);
 
         System.out.println("========================================");
@@ -34,8 +37,9 @@ public class Main {
             System.out.println("1. Provider Login");
             System.out.println("2. Operator Login");
             System.out.println("3. Manager Login");
-            System.out.println("4. Exit");
-            System.out.print("Select role: ");
+            System.out.println("4. Run Main Accounting Procedure");
+            System.out.println("5. Exit");
+            System.out.print("Select option: ");
 
             String choice = scanner.nextLine().trim();
             switch (choice) {
@@ -54,8 +58,12 @@ public class Main {
                     mgrTerminal.startSession();
                     break;
                 case "4":
+                    reportGenerator.runAccountingProcedure();
+                    break;
+                case "5":
                     running = false;
-                    System.out.println("Shutting down ChocAn system. Goodbye!");
+                    DataPersistence.saveAll(memberDb, providerDb, serviceDir, recordDb);
+                    System.out.println("Data saved. Shutting down ChocAn system. Goodbye!");
                     break;
                 default:
                     System.out.println("Invalid option. Please try again.");

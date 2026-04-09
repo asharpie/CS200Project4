@@ -23,11 +23,19 @@ public class ManagerTerminal {
         this.scanner = scanner;
     }
 
+    private static final String MANAGER_PASSWORD = "manager123";
+
     /**
-     * Start a manager session.
+     * Start a manager session. Requires password authentication.
      */
     public void startSession() {
-        System.out.println("Manager logged in.");
+        System.out.print("Enter manager password: ");
+        String password = scanner.nextLine().trim();
+        if (!MANAGER_PASSWORD.equals(password)) {
+            System.out.println("Invalid password. Access denied.");
+            return;
+        }
+        System.out.println("Manager login validated.");
         sessionMenu();
     }
 
