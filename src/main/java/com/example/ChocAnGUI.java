@@ -1086,6 +1086,18 @@ public class ChocAnGUI extends JFrame {
         header.setPreferredSize(new Dimension(0, 35));
         dialog.getContentPane().add(header, BorderLayout.NORTH);
 
+        // Close button at bottom
+        JButton closeBtn = new JButton("Close");
+        closeBtn.setBackground(BAMA_CRIMSON_DARK);
+        closeBtn.setForeground(BAMA_WHITE);
+        closeBtn.setFocusPainted(false);
+        closeBtn.setFont(new Font("SansSerif", Font.BOLD, 13));
+        closeBtn.addActionListener(e -> dialog.dispose());
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel.setBackground(BAMA_BLACK);
+        bottomPanel.add(closeBtn);
+        dialog.getContentPane().add(bottomPanel, BorderLayout.SOUTH);
+
         dialog.setVisible(true);
     }
 
