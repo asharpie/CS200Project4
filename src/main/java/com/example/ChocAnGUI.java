@@ -31,6 +31,8 @@ public class ChocAnGUI extends JFrame {
     private JTextArea outputArea;
 
     private Provider currentProvider;
+    private JTable memberTable;
+    private JTable providerTable;
 
     // Bama theme colors
     private static final Color BAMA_BLACK = new Color(0, 0, 0);
@@ -284,7 +286,8 @@ public class ChocAnGUI extends JFrame {
         JButton refreshBtn = createBarButton("Refresh");
         DefaultTableModel model = new DefaultTableModel(
                 new String[]{"Number", "Name", "Address", "City", "State", "ZIP", "Suspended"}, 0);
-        JTable table = new JTable(model);
+        memberTable = new JTable(model);
+        JTable table = memberTable;
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         styleTable(table);
 
@@ -314,7 +317,8 @@ public class ChocAnGUI extends JFrame {
         JButton refreshBtn = createBarButton("Refresh");
         DefaultTableModel model = new DefaultTableModel(
                 new String[]{"Number", "Name", "Address", "City", "State", "ZIP"}, 0);
-        JTable table = new JTable(model);
+        providerTable = new JTable(model);
+        JTable table = providerTable;
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         styleTable(table);
 
@@ -643,16 +647,20 @@ public class ChocAnGUI extends JFrame {
     }
 
     private void guiEditMember() {
-        String input = JOptionPane.showInputDialog(this,
-                "Enter member number to edit:", "Edit Member", JOptionPane.PLAIN_MESSAGE);
-        if (input == null) return;
-
+        int selectedRow = memberTable != null ? memberTable.getSelectedRow() : -1;
         int number;
-        try {
-            number = Integer.parseInt(input.trim());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid number.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        if (selectedRow >= 0) {
+            number = Integer.parseInt(memberTable.getValueAt(selectedRow, 0).toString().trim());
+        } else {
+            String input = JOptionPane.showInputDialog(this,
+                    "Select a member in the table, or enter member number:", "Edit Member", JOptionPane.PLAIN_MESSAGE);
+            if (input == null) return;
+            try {
+                number = Integer.parseInt(input.trim());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid number.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
 
         Member existing = memberDb.getMember(number);
@@ -696,16 +704,20 @@ public class ChocAnGUI extends JFrame {
     }
 
     private void guiDeleteMember() {
-        String input = JOptionPane.showInputDialog(this,
-                "Enter member number to delete:", "Delete Member", JOptionPane.PLAIN_MESSAGE);
-        if (input == null) return;
-
+        int selectedRow = memberTable != null ? memberTable.getSelectedRow() : -1;
         int number;
-        try {
-            number = Integer.parseInt(input.trim());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid number.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        if (selectedRow >= 0) {
+            number = Integer.parseInt(memberTable.getValueAt(selectedRow, 0).toString().trim());
+        } else {
+            String input = JOptionPane.showInputDialog(this,
+                    "Select a member in the table, or enter member number:", "Delete Member", JOptionPane.PLAIN_MESSAGE);
+            if (input == null) return;
+            try {
+                number = Integer.parseInt(input.trim());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid number.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
 
         Member m = memberDb.getMember(number);
@@ -771,16 +783,20 @@ public class ChocAnGUI extends JFrame {
     }
 
     private void guiEditProvider() {
-        String input = JOptionPane.showInputDialog(this,
-                "Enter provider number to edit:", "Edit Provider", JOptionPane.PLAIN_MESSAGE);
-        if (input == null) return;
-
+        int selectedRow = providerTable != null ? providerTable.getSelectedRow() : -1;
         int number;
-        try {
-            number = Integer.parseInt(input.trim());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid number.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        if (selectedRow >= 0) {
+            number = Integer.parseInt(providerTable.getValueAt(selectedRow, 0).toString().trim());
+        } else {
+            String input = JOptionPane.showInputDialog(this,
+                    "Select a provider in the table, or enter provider number:", "Edit Provider", JOptionPane.PLAIN_MESSAGE);
+            if (input == null) return;
+            try {
+                number = Integer.parseInt(input.trim());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid number.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
 
         Provider existing = providerDb.getProvider(number);
@@ -824,16 +840,20 @@ public class ChocAnGUI extends JFrame {
     }
 
     private void guiDeleteProvider() {
-        String input = JOptionPane.showInputDialog(this,
-                "Enter provider number to delete:", "Delete Provider", JOptionPane.PLAIN_MESSAGE);
-        if (input == null) return;
-
+        int selectedRow = providerTable != null ? providerTable.getSelectedRow() : -1;
         int number;
-        try {
-            number = Integer.parseInt(input.trim());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid number.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        if (selectedRow >= 0) {
+            number = Integer.parseInt(providerTable.getValueAt(selectedRow, 0).toString().trim());
+        } else {
+            String input = JOptionPane.showInputDialog(this,
+                    "Select a provider in the table, or enter provider number:", "Delete Provider", JOptionPane.PLAIN_MESSAGE);
+            if (input == null) return;
+            try {
+                number = Integer.parseInt(input.trim());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid number.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
 
         Provider p = providerDb.getProvider(number);
