@@ -241,31 +241,43 @@ public class ChocAnGUI extends JFrame {
         header.setForeground(BAMA_WHITE);
         header.setPreferredSize(new Dimension(0, 45));
 
-        JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 10));
-        buttonBar.setBackground(BAMA_BLACK);
+        // Member buttons
+        JPanel memberButtonBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 10));
+        memberButtonBar.setBackground(BAMA_BLACK);
         JButton addMemberBtn = createBarButton("Add Member");
         JButton editMemberBtn = createBarButton("Edit Member");
         JButton deleteMemberBtn = createBarButton("Delete Member");
-        JButton addProvBtn = createBarButton("Add Provider");
-        JButton editProvBtn = createBarButton("Edit Provider");
-        JButton deleteProvBtn = createBarButton("Delete Provider");
-        JButton logoutBtn = createBarButton("Log Out");
-
+        JButton logoutBtn1 = createBarButton("Log Out");
         addMemberBtn.addActionListener(e -> guiAddMember());
         editMemberBtn.addActionListener(e -> guiEditMember());
         deleteMemberBtn.addActionListener(e -> guiDeleteMember());
+        logoutBtn1.addActionListener(e -> cardLayout.show(mainPanel, "LOGIN"));
+        memberButtonBar.add(addMemberBtn);
+        memberButtonBar.add(editMemberBtn);
+        memberButtonBar.add(deleteMemberBtn);
+        memberButtonBar.add(logoutBtn1);
+
+        // Provider buttons
+        JPanel providerButtonBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 10));
+        providerButtonBar.setBackground(BAMA_BLACK);
+        JButton addProvBtn = createBarButton("Add Provider");
+        JButton editProvBtn = createBarButton("Edit Provider");
+        JButton deleteProvBtn = createBarButton("Delete Provider");
+        JButton logoutBtn2 = createBarButton("Log Out");
         addProvBtn.addActionListener(e -> guiAddProvider());
         editProvBtn.addActionListener(e -> guiEditProvider());
         deleteProvBtn.addActionListener(e -> guiDeleteProvider());
-        logoutBtn.addActionListener(e -> cardLayout.show(mainPanel, "LOGIN"));
+        logoutBtn2.addActionListener(e -> cardLayout.show(mainPanel, "LOGIN"));
+        providerButtonBar.add(addProvBtn);
+        providerButtonBar.add(editProvBtn);
+        providerButtonBar.add(deleteProvBtn);
+        providerButtonBar.add(logoutBtn2);
 
-        buttonBar.add(addMemberBtn);
-        buttonBar.add(editMemberBtn);
-        buttonBar.add(deleteMemberBtn);
-        buttonBar.add(addProvBtn);
-        buttonBar.add(editProvBtn);
-        buttonBar.add(deleteProvBtn);
-        buttonBar.add(logoutBtn);
+        // Button bar that swaps based on active tab
+        JPanel buttonBar = new JPanel(new CardLayout());
+        buttonBar.add(memberButtonBar, "MEMBERS");
+        buttonBar.add(providerButtonBar, "PROVIDERS");
+        CardLayout buttonCardLayout = (CardLayout) buttonBar.getLayout();
 
         // Members and Providers tables
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -273,6 +285,14 @@ public class ChocAnGUI extends JFrame {
         tabbedPane.setForeground(BAMA_WHITE);
         tabbedPane.addTab("Members", createMemberTablePanel());
         tabbedPane.addTab("Providers", createProviderTablePanel());
+
+        tabbedPane.addChangeListener(e -> {
+            if (tabbedPane.getSelectedIndex() == 0) {
+                buttonCardLayout.show(buttonBar, "MEMBERS");
+            } else {
+                buttonCardLayout.show(buttonBar, "PROVIDERS");
+            }
+        });
 
         panel.add(header, BorderLayout.NORTH);
         panel.add(buttonBar, BorderLayout.SOUTH);
