@@ -20,6 +20,10 @@ import java.util.Set;
  * - Provider reports
  * - Summary report (for manager / accounts payable)
  * - EFT data file
+ *
+ * The main accounting procedure saves all reports to a timestamped folder
+ * under {@code reports/} (e.g., {@code reports/Accounting_Report_MM-dd-yyyy_HH-mm-ss/}).
+ * Individual report methods can also write to a specified output directory.
  * 
  * @author Jackie Clayton
  */

@@ -15,7 +15,15 @@ import java.util.List;
 
 /**
  * Swing GUI for the ChocAn Data Processing System.
- * Provides graphical interfaces for Provider, Operator, and Manager terminals.
+ * Provides graphical interfaces for Provider, Operator, and Manager terminals
+ * with a Bama-themed (crimson/black) color scheme.
+ *
+ * <p>Features include:
+ * <ul>
+ *   <li>Provider terminal: verify members, bill services (click service table to fill code), view directory</li>
+ *   <li>Operator terminal: tabbed Members/Providers panels with click-to-edit/delete table rows</li>
+ *   <li>Manager terminal: generate reports, run accounting procedure, browse saved report folders</li>
+ * </ul>
  *
  * @author Peyton Doucette
  */

@@ -36,7 +36,7 @@
 
 ## File Inventory
 
-### Source Files (13 total — in `src/main/java/com/example/`)
+### Source Files (15 total — in `src/main/java/com/example/`)
 
 | File                      | Author            | Description                              |
 |---------------------------|-------------------|------------------------------------------|
@@ -49,9 +49,11 @@
 | ServiceRecord.java        | Tim Madden        | Service record entity class              |
 | ServiceRecordDatabase.java| Tim Madden        | Weekly service record storage             |
 | Main.java                 | Peyton Doucette   | Entry point, login system, sample data   |
+| ChocAnGUI.java            | Peyton Doucette   | Swing GUI (Bama theme) for all terminals |
+| DataPersistence.java      | Peyton Doucette   | Save/load all data to/from disk          |
 | ManagerTerminal.java      | Peyton Doucette   | Manager UI (reports, accounting)         |
 | ProviderTerminal.java     | Jackie Clayton    | Provider UI (verify, bill, directory)    |
-| ReportGenerator.java      | Jackie Clayton    | All report generation                    |
+| ReportGenerator.java      | Jackie Clayton    | All report generation & accounting       |
 | OperatorTerminal.java     | Aaron Sharp       | Operator UI (member/provider CRUD)       |
 
 ### Test Files (7 total — in `src/test/java/com/example/`)
@@ -66,19 +68,21 @@
 | JackieClaytonTest.java    | Jackie Clayton    | ReportGenerator.generateMemberReport, ReportGenerator.generateProviderReport + MemberDatabase.updateMember (Timothy) |
 | AaronSharpTest.java       | Aaron Sharp       | MemberDatabase add/delete (via OperatorTerminal), ProviderDatabase add/delete (via OperatorTerminal) + ServiceRecordDatabase.getRecordsForProvider (Tim) |
 
-### Build & Documentation Files
+| Build & Documentation Files
 
 | File             | Uploader          | Description                              |
 |------------------|-------------------|------------------------------------------|
 | build.xml        | Peyton Doucette   | ANT build script                         |
 | pom.xml          | Aaron Sharp       | Maven build configuration                |
 | UserManual.md    | Peyton Doucette   | User manual for the ChocAn system        |
+| SubmissionGuide.md | Aaron Sharp     | Submission guide & task distribution     |
+| .gitignore       | Aaron Sharp       | Git ignore rules                         |
 
 ---
 
 ## Who Uploads What
 
-Each team member must commit their assigned files to the GitHub repository. **Every person pushes 3 files** (Peyton pushes 5 as team lead, to include build config and the manual).
+Each team member must commit their assigned files to the GitHub repository. **Every person pushes 3 files** (Peyton pushes 7 as team lead, to include build config, the GUI, data persistence, and the manual).
 
 ### 1. Timothy Sazonov — 3 files
 
@@ -120,15 +124,17 @@ git commit -m "Tim Madden: ServiceRecord entity, ServiceRecordDatabase, and unit
 git push
 ```
 
-### 5. Peyton Doucette (Team Lead) — 5 files
+### 5. Peyton Doucette (Team Lead) — 7 files
 
 ```
 git add src/main/java/com/example/Main.java
+git add src/main/java/com/example/ChocAnGUI.java
+git add src/main/java/com/example/DataPersistence.java
 git add src/main/java/com/example/ManagerTerminal.java
 git add src/test/java/com/example/PeytonDoucetteTest.java
 git add build.xml
 git add manual/UserManual.md
-git commit -m "Peyton Doucette: Main, ManagerTerminal, unit tests, build.xml, user manual"
+git commit -m "Peyton Doucette: Main, ChocAnGUI, DataPersistence, ManagerTerminal, unit tests, build.xml, user manual"
 git push
 ```
 
@@ -199,7 +205,7 @@ git push
 | Arya Karnik        | Provider, ProviderDatabase       | AryaKarnikTest.java         | JavaDoc for Provider.java | ~14%          |
 | Joel Nelems        | Service, ServiceDirectory        | JoelNelemsTest.java         | JavaDoc for Service.java  | ~14%          |
 | Tim Madden         | ServiceRecord, ServiceRecordDatabase | TimMaddenTest.java      | JavaDoc for ServiceRecord.java | ~14%     |
-| Peyton Doucette    | Main, ManagerTerminal            | PeytonDoucetteTest.java     | build.xml, UserManual.md, final assembly, JavaDoc for Main.java | ~16% |
+| Peyton Doucette    | Main, ManagerTerminal, ChocAnGUI, DataPersistence | PeytonDoucetteTest.java     | build.xml, UserManual.md, final assembly, Swing GUI, data persistence | ~16% |
 | Jackie Clayton     | ProviderTerminal, ReportGenerator | JackieClaytonTest.java     | JavaDoc for ReportGenerator.java | ~14%   |
 | Aaron Sharp        | OperatorTerminal                 | AaronSharpTest.java         | pom.xml, JavaDoc for OperatorTerminal.java | ~14% |
 
@@ -290,13 +296,31 @@ You will see the main menu:
 Choose an option:
 ```
 
+### GUI Mode (Default)
+
+By default, the application launches a Bama-themed Swing GUI. The login screen has
+buttons for Provider Login, Operator Login, Manager Login, and Exit.
+
+| Terminal | Login Method |
+|----------|-------------|
+| Provider | Enter 9-digit provider number |
+| Operator | Password: `operator123` |
+| Manager  | Password: `manager123` |
+
+### Console Mode
+
+Start with `--console` flag:
+```bash
+java -jar release/ChocAn.jar --console
+```
+
 ### Sample Login Credentials (Provider Numbers)
 
 | Provider         | Number    |
 |------------------|-----------|
-| Dr. Smith        | 200000001 |
-| Dr. Johnson      | 200000002 |
-| Dr. Williams     | 200000003 |
+| Dr. Sarah Wilson | 999000001 |
+| Dr. Mike Chen    | 999000002 |
+| Dr. Emily Davis  | 999000003 |
 
 ### Sample Member Numbers
 
@@ -310,8 +334,8 @@ Choose an option:
 ### Testing Each Feature
 
 1. **Provider Terminal**: Log in with provider number → verify a member → bill a service → request directory
-2. **Operator Terminal**: Log in (enter any input) → add/delete/update members and providers
-3. **Manager Terminal**: Log in (enter any input) → request reports → run accounting procedure
+2. **Operator Terminal**: Log in with password `operator123` → add/delete/update members and providers
+3. **Manager Terminal**: Log in with password `manager123` → request reports → run accounting procedure → view reports
 
 ---
 
@@ -356,12 +380,16 @@ Before final submission, verify the repo matches this structure:
 ```
 ├── build.xml                          ← ANT script (Peyton)
 ├── pom.xml                            ← Maven config (Aaron)
+├── .gitignore                         ← Git ignore rules
+├── SubmissionGuide.md                 ← This file
 ├── src/
 │   ├── main/
 │   │   └── java/
 │   │       └── com/
 │   │           └── example/
 │   │               ├── Main.java                  ← Peyton
+│   │               ├── ChocAnGUI.java             ← Peyton
+│   │               ├── DataPersistence.java       ← Peyton
 │   │               ├── Member.java                ← Timothy
 │   │               ├── MemberDatabase.java        ← Timothy
 │   │               ├── Provider.java              ← Arya
@@ -385,6 +413,8 @@ Before final submission, verify the repo matches this structure:
 │                   ├── PeytonDoucetteTest.java    ← Peyton
 │                   ├── JackieClaytonTest.java     ← Jackie
 │                   └── AaronSharpTest.java        ← Aaron
+├── data/                              ← Auto-saved data (runtime)
+├── reports/                           ← Accounting report folders (runtime)
 ├── doc/                               ← Generated JavaDocs (Peyton final push)
 ├── manual/
 │   └── UserManual.md                  ← User manual (Peyton)
@@ -396,7 +426,7 @@ Before final submission, verify the repo matches this structure:
 ### Final Checklist
 
 - [ ] All 7 members have commits in the repo
-- [ ] All 13 source files compile without errors
+- [ ] All 15 source files compile without errors
 - [ ] All 48 unit tests pass (green)
 - [ ] `ant clean jar` produces `release/ChocAn.jar`
 - [ ] `java -jar release/ChocAn.jar` runs successfully
