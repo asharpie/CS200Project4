@@ -2,6 +2,8 @@ package com.example;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -30,6 +32,13 @@ public class ChocAnGUI extends JFrame {
 
     private Provider currentProvider;
 
+    // Bama theme colors
+    private static final Color BAMA_BLACK = new Color(0, 0, 0);
+    private static final Color BAMA_CRIMSON = new Color(158, 27, 50);
+    private static final Color BAMA_CRIMSON_DARK = new Color(118, 20, 38);
+    private static final Color BAMA_WHITE = Color.WHITE;
+    private static final Color BAMA_GRAY = new Color(30, 30, 30);
+
     public ChocAnGUI(MemberDatabase memberDb, ProviderDatabase providerDb,
                      ServiceDirectory serviceDir, ServiceRecordDatabase recordDb) {
         this.memberDb = memberDb;
@@ -48,9 +57,11 @@ public class ChocAnGUI extends JFrame {
         });
         setSize(900, 650);
         setLocationRelativeTo(null);
+        getContentPane().setBackground(BAMA_BLACK);
 
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
+        mainPanel.setBackground(BAMA_BLACK);
 
         mainPanel.add(createLoginPanel(), "LOGIN");
         mainPanel.add(createProviderPanel(), "PROVIDER");
@@ -78,17 +89,17 @@ public class ChocAnGUI extends JFrame {
 
     private JPanel createLoginPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(45, 45, 60));
+        panel.setBackground(BAMA_BLACK);
 
         // Title
         JLabel titleLabel = new JLabel("Chocoholics Anonymous (ChocAn)", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 28));
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(BAMA_WHITE);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(40, 0, 10, 0));
 
         JLabel subtitleLabel = new JLabel("Data Processing System", SwingConstants.CENTER);
         subtitleLabel.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        subtitleLabel.setForeground(new Color(180, 180, 200));
+        subtitleLabel.setForeground(new Color(200, 200, 200));
         subtitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
 
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -101,11 +112,11 @@ public class ChocAnGUI extends JFrame {
         buttonPanel.setOpaque(false);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 200, 80, 200));
 
-        JButton providerBtn = createStyledButton("Provider Login", new Color(46, 125, 50));
-        JButton operatorBtn = createStyledButton("Operator Login", new Color(21, 101, 192));
-        JButton managerBtn = createStyledButton("Manager Login", new Color(156, 39, 176));
-        JButton accountingBtn = createStyledButton("Run Main Accounting Procedure", new Color(230, 126, 34));
-        JButton exitBtn = createStyledButton("Exit", new Color(183, 28, 28));
+        JButton providerBtn = createStyledButton("Provider Login", BAMA_CRIMSON);
+        JButton operatorBtn = createStyledButton("Operator Login", BAMA_CRIMSON);
+        JButton managerBtn = createStyledButton("Manager Login", BAMA_CRIMSON);
+        JButton accountingBtn = createStyledButton("Run Main Accounting Procedure", BAMA_CRIMSON);
+        JButton exitBtn = createStyledButton("Exit", BAMA_CRIMSON_DARK);
 
         providerBtn.addActionListener(e -> providerLogin());
         operatorBtn.addActionListener(e -> operatorLogin());
@@ -128,7 +139,7 @@ public class ChocAnGUI extends JFrame {
         JButton btn = new JButton(text);
         btn.setFont(new Font("SansSerif", Font.BOLD, 14));
         btn.setBackground(bgColor);
-        btn.setForeground(Color.WHITE);
+        btn.setForeground(BAMA_WHITE);
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setOpaque(true);
@@ -136,23 +147,61 @@ public class ChocAnGUI extends JFrame {
         return btn;
     }
 
+    private JButton createBarButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btn.setBackground(BAMA_CRIMSON);
+        btn.setForeground(BAMA_WHITE);
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setOpaque(true);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+
+    private void styleTable(JTable table) {
+        table.setBackground(BAMA_GRAY);
+        table.setForeground(BAMA_WHITE);
+        table.setGridColor(new Color(60, 60, 60));
+        table.setSelectionBackground(BAMA_CRIMSON);
+        table.setSelectionForeground(BAMA_WHITE);
+        table.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        table.setRowHeight(24);
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(BAMA_CRIMSON_DARK);
+        header.setForeground(BAMA_WHITE);
+        header.setFont(new Font("SansSerif", Font.BOLD, 13));
+    }
+
+    private JTextArea createStyledTextArea() {
+        JTextArea ta = new JTextArea();
+        ta.setEditable(false);
+        ta.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        ta.setBackground(BAMA_GRAY);
+        ta.setForeground(BAMA_WHITE);
+        ta.setCaretColor(BAMA_WHITE);
+        return ta;
+    }
+
     // ==================== PROVIDER PANEL ====================
 
     private JPanel createProviderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(BAMA_BLACK);
 
         JLabel header = new JLabel("  Provider Terminal", SwingConstants.LEFT);
         header.setFont(new Font("SansSerif", Font.BOLD, 20));
         header.setOpaque(true);
-        header.setBackground(new Color(46, 125, 50));
-        header.setForeground(Color.WHITE);
+        header.setBackground(BAMA_CRIMSON);
+        header.setForeground(BAMA_WHITE);
         header.setPreferredSize(new Dimension(0, 45));
 
         JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        JButton verifyBtn = new JButton("Verify Member");
-        JButton billBtn = new JButton("Bill Service");
-        JButton dirBtn = new JButton("Provider Directory");
-        JButton logoutBtn = new JButton("Log Out");
+        buttonBar.setBackground(BAMA_BLACK);
+        JButton verifyBtn = createBarButton("Verify Member");
+        JButton billBtn = createBarButton("Bill Service");
+        JButton dirBtn = createBarButton("Provider Directory");
+        JButton logoutBtn = createBarButton("Log Out");
 
         verifyBtn.addActionListener(e -> guiVerifyMember());
         billBtn.addActionListener(e -> guiBillService());
@@ -167,10 +216,9 @@ public class ChocAnGUI extends JFrame {
         buttonBar.add(dirBtn);
         buttonBar.add(logoutBtn);
 
-        outputArea = new JTextArea();
-        outputArea.setEditable(false);
-        outputArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        outputArea = createStyledTextArea();
         JScrollPane scrollPane = new JScrollPane(outputArea);
+        scrollPane.getViewport().setBackground(BAMA_GRAY);
 
         panel.add(header, BorderLayout.NORTH);
         panel.add(buttonBar, BorderLayout.SOUTH);
@@ -182,22 +230,24 @@ public class ChocAnGUI extends JFrame {
 
     private JPanel createOperatorPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(BAMA_BLACK);
 
         JLabel header = new JLabel("  Operator Terminal", SwingConstants.LEFT);
         header.setFont(new Font("SansSerif", Font.BOLD, 20));
         header.setOpaque(true);
-        header.setBackground(new Color(21, 101, 192));
-        header.setForeground(Color.WHITE);
+        header.setBackground(BAMA_CRIMSON);
+        header.setForeground(BAMA_WHITE);
         header.setPreferredSize(new Dimension(0, 45));
 
         JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 10));
-        JButton addMemberBtn = new JButton("Add Member");
-        JButton editMemberBtn = new JButton("Edit Member");
-        JButton deleteMemberBtn = new JButton("Delete Member");
-        JButton addProvBtn = new JButton("Add Provider");
-        JButton editProvBtn = new JButton("Edit Provider");
-        JButton deleteProvBtn = new JButton("Delete Provider");
-        JButton logoutBtn = new JButton("Log Out");
+        buttonBar.setBackground(BAMA_BLACK);
+        JButton addMemberBtn = createBarButton("Add Member");
+        JButton editMemberBtn = createBarButton("Edit Member");
+        JButton deleteMemberBtn = createBarButton("Delete Member");
+        JButton addProvBtn = createBarButton("Add Provider");
+        JButton editProvBtn = createBarButton("Edit Provider");
+        JButton deleteProvBtn = createBarButton("Delete Provider");
+        JButton logoutBtn = createBarButton("Log Out");
 
         addMemberBtn.addActionListener(e -> guiAddMember());
         editMemberBtn.addActionListener(e -> guiEditMember());
@@ -217,6 +267,8 @@ public class ChocAnGUI extends JFrame {
 
         // Members and Providers tables
         JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setBackground(BAMA_GRAY);
+        tabbedPane.setForeground(BAMA_WHITE);
         tabbedPane.addTab("Members", createMemberTablePanel());
         tabbedPane.addTab("Providers", createProviderTablePanel());
 
@@ -228,11 +280,13 @@ public class ChocAnGUI extends JFrame {
 
     private JPanel createMemberTablePanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        JButton refreshBtn = new JButton("Refresh");
+        panel.setBackground(BAMA_BLACK);
+        JButton refreshBtn = createBarButton("Refresh");
         DefaultTableModel model = new DefaultTableModel(
                 new String[]{"Number", "Name", "Address", "City", "State", "ZIP", "Suspended"}, 0);
         JTable table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        styleTable(table);
 
         Runnable refreshMembers = () -> {
             model.setRowCount(0);
@@ -256,11 +310,13 @@ public class ChocAnGUI extends JFrame {
 
     private JPanel createProviderTablePanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        JButton refreshBtn = new JButton("Refresh");
+        panel.setBackground(BAMA_BLACK);
+        JButton refreshBtn = createBarButton("Refresh");
         DefaultTableModel model = new DefaultTableModel(
                 new String[]{"Number", "Name", "Address", "City", "State", "ZIP"}, 0);
         JTable table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        styleTable(table);
 
         Runnable refreshProviders = () -> {
             model.setRowCount(0);
@@ -285,24 +341,24 @@ public class ChocAnGUI extends JFrame {
 
     private JPanel createManagerPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(BAMA_BLACK);
 
         JLabel header = new JLabel("  Manager Terminal", SwingConstants.LEFT);
         header.setFont(new Font("SansSerif", Font.BOLD, 20));
         header.setOpaque(true);
-        header.setBackground(new Color(156, 39, 176));
-        header.setForeground(Color.WHITE);
+        header.setBackground(BAMA_CRIMSON);
+        header.setForeground(BAMA_WHITE);
         header.setPreferredSize(new Dimension(0, 45));
 
         JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        JButton memberRptBtn = new JButton("Member Report");
-        JButton providerRptBtn = new JButton("Provider Report");
-        JButton summaryRptBtn = new JButton("Summary Report");
-        JButton accountingBtn = new JButton("Run Accounting Procedure");
-        JButton logoutBtn = new JButton("Log Out");
+        buttonBar.setBackground(BAMA_BLACK);
+        JButton memberRptBtn = createBarButton("Member Report");
+        JButton providerRptBtn = createBarButton("Provider Report");
+        JButton summaryRptBtn = createBarButton("Summary Report");
+        JButton accountingBtn = createBarButton("Run Accounting Procedure");
+        JButton logoutBtn = createBarButton("Log Out");
 
-        JTextArea mgrOutput = new JTextArea();
-        mgrOutput.setEditable(false);
-        mgrOutput.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        JTextArea mgrOutput = createStyledTextArea();
 
         memberRptBtn.addActionListener(e -> guiMemberReport(mgrOutput));
         providerRptBtn.addActionListener(e -> guiProviderReport(mgrOutput));
@@ -316,9 +372,12 @@ public class ChocAnGUI extends JFrame {
         buttonBar.add(accountingBtn);
         buttonBar.add(logoutBtn);
 
+        JScrollPane mgrScroll = new JScrollPane(mgrOutput);
+        mgrScroll.getViewport().setBackground(BAMA_GRAY);
+
         panel.add(header, BorderLayout.NORTH);
         panel.add(buttonBar, BorderLayout.SOUTH);
-        panel.add(new JScrollPane(mgrOutput), BorderLayout.CENTER);
+        panel.add(mgrScroll, BorderLayout.CENTER);
         return panel;
     }
 
