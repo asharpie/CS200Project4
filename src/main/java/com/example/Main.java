@@ -1,9 +1,11 @@
 package com.example;
 
 import java.util.Scanner;
+import javax.swing.SwingUtilities;
 
 /**
  * Main entry point for the Chocoholics Anonymous (ChocAn) data processing system.
+ * Supports both GUI mode (--gui flag or default) and console mode (--console flag).
  * Presents a login menu with three roles: Provider, Operator, and Manager.
  * Each role enters a persistent session that returns to its own menu
  * until the user explicitly logs out, at which point they return here.
@@ -27,6 +29,26 @@ public class Main {
         }
         reportGenerator = new ReportGenerator(memberDb, providerDb, serviceDir, recordDb);
 
+        // Check for --console flag; default is GUI mode
+        boolean consoleMode = false;
+        for (String arg : args) {
+            if ("--console".equalsIgnoreCase(arg)) {
+                consoleMode = true;
+                break;
+            }
+        }
+
+        if (consoleMode) {
+            runConsoleMode();
+        } else {
+            SwingUtilities.invokeLater(() -> {
+                ChocAnGUI gui = new ChocAnGUI(memberDb, providerDb, serviceDir, recordDb);
+                gui.setVisible(true);
+            });
+        }
+    }
+
+    private static void runConsoleMode() {
         System.out.println("========================================");
         System.out.println("  Chocoholics Anonymous (ChocAn) System");
         System.out.println("========================================");
