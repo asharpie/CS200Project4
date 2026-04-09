@@ -110,26 +110,23 @@ public class ChocAnGUI extends JFrame {
         headerPanel.add(subtitleLabel, BorderLayout.SOUTH);
 
         // Buttons
-        JPanel buttonPanel = new JPanel(new GridLayout(5, 1, 10, 10));
+        JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 10, 10));
         buttonPanel.setOpaque(false);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 200, 80, 200));
 
         JButton providerBtn = createStyledButton("Provider Login", BAMA_CRIMSON);
         JButton operatorBtn = createStyledButton("Operator Login", BAMA_CRIMSON);
         JButton managerBtn = createStyledButton("Manager Login", BAMA_CRIMSON);
-        JButton accountingBtn = createStyledButton("Run Main Accounting Procedure", BAMA_CRIMSON);
         JButton exitBtn = createStyledButton("Exit", BAMA_CRIMSON_DARK);
 
         providerBtn.addActionListener(e -> providerLogin());
         operatorBtn.addActionListener(e -> operatorLogin());
         managerBtn.addActionListener(e -> managerLogin());
-        accountingBtn.addActionListener(e -> runAccountingFromMain());
         exitBtn.addActionListener(e -> exitApplication());
 
         buttonPanel.add(providerBtn);
         buttonPanel.add(operatorBtn);
         buttonPanel.add(managerBtn);
-        buttonPanel.add(accountingBtn);
         buttonPanel.add(exitBtn);
 
         panel.add(headerPanel, BorderLayout.NORTH);
@@ -473,17 +470,7 @@ public class ChocAnGUI extends JFrame {
         cardLayout.show(mainPanel, "MANAGER");
     }
 
-    private void runAccountingFromMain() {
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Run main accounting procedure now?", "Accounting", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            String folder = reportGenerator.runAccountingProcedureToFolder();
-            JOptionPane.showMessageDialog(this, "Main accounting procedure completed.\nReports saved to: " + folder,
-                    "Complete", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    // ==================== PROVIDER ACTIONS ====================
+    // ==================== PROVIDER ACTIONS ==
 
     private void guiVerifyMember() {
         String input = JOptionPane.showInputDialog(this,

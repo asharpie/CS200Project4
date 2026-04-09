@@ -59,8 +59,7 @@ public class Main {
             System.out.println("1. Provider Login");
             System.out.println("2. Operator Login");
             System.out.println("3. Manager Login");
-            System.out.println("4. Run Main Accounting Procedure");
-            System.out.println("5. Exit");
+            System.out.println("4. Exit");
             System.out.print("Select option: ");
 
             String choice = scanner.nextLine().trim();
@@ -80,9 +79,6 @@ public class Main {
                     mgrTerminal.startSession();
                     break;
                 case "4":
-                    reportGenerator.runAccountingProcedure();
-                    break;
-                case "5":
                     running = false;
                     DataPersistence.saveAll(memberDb, providerDb, serviceDir, recordDb);
                     System.out.println("Data saved. Shutting down ChocAn system. Goodbye!");
