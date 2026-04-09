@@ -1,0 +1,25 @@
+# Build outputs
+target/
+build/
+lib/
+release/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated reports
+*.txt
+!UserManual.md
+!SubmissionGuide.md
+
+# Generated docs (will be added separately)
+doc/
