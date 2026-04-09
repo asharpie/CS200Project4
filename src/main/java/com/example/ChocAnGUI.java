@@ -380,6 +380,7 @@ public class ChocAnGUI extends JFrame {
         JButton providerRptBtn = createBarButton("Provider Report");
         JButton summaryRptBtn = createBarButton("Summary Report");
         JButton accountingBtn = createBarButton("Run Accounting Procedure");
+        JButton viewReportsBtn = createBarButton("View Reports");
         JButton logoutBtn = createBarButton("Log Out");
 
         JTextArea mgrOutput = createStyledTextArea();
@@ -388,12 +389,14 @@ public class ChocAnGUI extends JFrame {
         providerRptBtn.addActionListener(e -> guiProviderReport(mgrOutput));
         summaryRptBtn.addActionListener(e -> guiSummaryReport(mgrOutput));
         accountingBtn.addActionListener(e -> guiAccountingProcedure(mgrOutput));
+        viewReportsBtn.addActionListener(e -> guiViewReports());
         logoutBtn.addActionListener(e -> cardLayout.show(mainPanel, "LOGIN"));
 
         buttonBar.add(memberRptBtn);
         buttonBar.add(providerRptBtn);
         buttonBar.add(summaryRptBtn);
         buttonBar.add(accountingBtn);
+        buttonBar.add(viewReportsBtn);
         buttonBar.add(logoutBtn);
 
         JScrollPane mgrScroll = new JScrollPane(mgrOutput);
@@ -474,8 +477,8 @@ public class ChocAnGUI extends JFrame {
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Run main accounting procedure now?", "Accounting", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
-            reportGenerator.runAccountingProcedure();
-            JOptionPane.showMessageDialog(this, "Main accounting procedure completed.\nReports generated.",
+            String folder = reportGenerator.runAccountingProcedureToFolder();
+            JOptionPane.showMessageDialog(this, "Main accounting procedure completed.\nReports saved to: " + folder,
                     "Complete", JOptionPane.INFORMATION_MESSAGE);
         }
     }
@@ -972,22 +975,131 @@ public class ChocAnGUI extends JFrame {
                 "Run the main accounting procedure?", "Accounting Procedure", JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) return;
 
-        reportGenerator.runAccountingProcedure();
+        String folder = reportGenerator.runAccountingProcedureToFolder();
         output.append("=== ACCOUNTING PROCEDURE COMPLETED ===\n");
+        output.append("Reports saved to: " + folder + "\n");
 
-        String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("MM-dd-yyyy"));
-        String summaryFile = "SummaryReport_" + dateStr + ".txt";
-        String eftFile = "EFT_Data_" + dateStr + ".txt";
-
-        if (new File(summaryFile).exists()) {
-            output.append("\n--- Summary Report ---\n");
-            output.append(readFileContents(summaryFile));
-        }
-        if (new File(eftFile).exists()) {
-            output.append("\n--- EFT Data ---\n");
-            output.append(readFileContents(eftFile));
+        // Display summary and EFT from the folder
+        File dir = new File(folder);
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                output.append("\n--- " + f.getName() + " ---\n");
+                output.append(readFileContents(f.getAbsolutePath()));
+            }
         }
         output.append("\n");
+    }
+
+    private void guiViewReports() {
+        File reportsDir = new File("reports");
+        if (!reportsDir.exists() || !reportsDir.isDirectory()) {
+            JOptionPane.showMessageDialog(this, "No reports found. Run the accounting procedure first.",
+                    "No Reports", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        File[] folders = reportsDir.listFiles(File::isDirectory);
+        if (folders == null || folders.length == 0) {
+            JOptionPane.showMessageDialog(this, "No report folders found.",
+                    "No Reports", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        java.util.Arrays.sort(folders, (a, b) -> b.getName().compareTo(a.getName()));
+
+        JDialog dialog = new JDialog(this, "Accounting Reports", true);
+        dialog.setSize(900, 600);
+        dialog.setLocationRelativeTo(this);
+        dialog.getContentPane().setBackground(BAMA_BLACK);
+
+        // Left panel: folder list
+        DefaultListModel<String> folderModel = new DefaultListModel<>();
+        for (File f : folders) folderModel.addElement(f.getName());
+        JList<String> folderList = new JList<>(folderModel);
+        folderList.setBackground(BAMA_GRAY);
+        folderList.setForeground(BAMA_WHITE);
+        folderList.setSelectionBackground(BAMA_CRIMSON);
+        folderList.setSelectionForeground(BAMA_WHITE);
+        folderList.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        JScrollPane folderScroll = new JScrollPane(folderList);
+        folderScroll.setPreferredSize(new Dimension(280, 0));
+        folderScroll.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(BAMA_CRIMSON), "Report Folders",
+                0, 0, null, BAMA_WHITE));
+        folderScroll.getViewport().setBackground(BAMA_GRAY);
+
+        // Center panel: file list
+        DefaultListModel<String> fileModel = new DefaultListModel<>();
+        JList<String> fileList = new JList<>(fileModel);
+        fileList.setBackground(BAMA_GRAY);
+        fileList.setForeground(BAMA_WHITE);
+        fileList.setSelectionBackground(BAMA_CRIMSON);
+        fileList.setSelectionForeground(BAMA_WHITE);
+        fileList.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        JScrollPane fileScroll = new JScrollPane(fileList);
+        fileScroll.setPreferredSize(new Dimension(200, 0));
+        fileScroll.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(BAMA_CRIMSON), "Files",
+                0, 0, null, BAMA_WHITE));
+        fileScroll.getViewport().setBackground(BAMA_GRAY);
+
+        // Right panel: file contents
+        JTextArea contentArea = createStyledTextArea();
+        JScrollPane contentScroll = new JScrollPane(contentArea);
+        contentScroll.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(BAMA_CRIMSON), "File Contents",
+                0, 0, null, BAMA_WHITE));
+        contentScroll.getViewport().setBackground(BAMA_GRAY);
+
+        // Wire up folder selection -> populate file list
+        folderList.addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) return;
+            String selected = folderList.getSelectedValue();
+            if (selected == null) return;
+            fileModel.clear();
+            contentArea.setText("");
+            File dir = new File("reports" + File.separator + selected);
+            File[] files = dir.listFiles();
+            if (files != null) {
+                java.util.Arrays.sort(files, (a, b) -> a.getName().compareTo(b.getName()));
+                for (File f : files) {
+                    if (f.isFile()) fileModel.addElement(f.getName());
+                }
+            }
+        });
+
+        // Wire up file selection -> show contents
+        fileList.addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) return;
+            String folder = folderList.getSelectedValue();
+            String file = fileList.getSelectedValue();
+            if (folder == null || file == null) return;
+            String path = "reports" + File.separator + folder + File.separator + file;
+            contentArea.setText(readFileContents(path));
+            contentArea.setCaretPosition(0);
+        });
+
+        JSplitPane rightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fileScroll, contentScroll);
+        rightSplit.setDividerLocation(200);
+        rightSplit.setBackground(BAMA_BLACK);
+
+        JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, folderScroll, rightSplit);
+        mainSplit.setDividerLocation(280);
+        mainSplit.setBackground(BAMA_BLACK);
+
+        dialog.getContentPane().add(mainSplit, BorderLayout.CENTER);
+
+        // Header
+        JLabel header = new JLabel("  Accounting Reports Viewer", SwingConstants.LEFT);
+        header.setFont(new Font("SansSerif", Font.BOLD, 16));
+        header.setOpaque(true);
+        header.setBackground(BAMA_CRIMSON);
+        header.setForeground(BAMA_WHITE);
+        header.setPreferredSize(new Dimension(0, 35));
+        dialog.getContentPane().add(header, BorderLayout.NORTH);
+
+        dialog.setVisible(true);
     }
 
     private String readFileContents(String filename) {

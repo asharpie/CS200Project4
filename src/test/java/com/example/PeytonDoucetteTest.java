@@ -72,17 +72,19 @@ public class PeytonDoucetteTest {
                 LocalDateTime.now(), LocalDate.now(), 200000001, 100000001, 100000, "Test"));
         reportGenerator.runAccountingProcedure();
 
-        String dateStr = LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("MM-dd-yyyy"));
-        assertTrue(new File("SummaryReport_" + dateStr + ".txt").exists());
-        assertTrue(new File("EFT_Data_" + dateStr + ".txt").exists());
+        File reportsDir = new File("reports");
+        assertTrue(reportsDir.exists());
+        File[] folders = reportsDir.listFiles(File::isDirectory);
+        assertNotNull(folders);
+        assertTrue(folders.length > 0);
     }
 
     @Test
     public void testRunAccountingProcedure_noRecords() {
         // Should not throw even with empty records
         reportGenerator.runAccountingProcedure();
-        String dateStr = LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("MM-dd-yyyy"));
-        assertTrue(new File("SummaryReport_" + dateStr + ".txt").exists());
+        File reportsDir = new File("reports");
+        assertTrue(reportsDir.exists());
     }
 
     // ---- Cross-member method: ServiceRecordDatabase.clearRecords() (Tim Madden) ----

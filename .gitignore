@@ -17,6 +17,7 @@ release/
 Thumbs.db
 
 # Generated reports
+reports/
 *.txt
 
 # Persistent data files

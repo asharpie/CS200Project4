@@ -1,9 +1,11 @@
 package com.example;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,6 +47,10 @@ public class ReportGenerator {
      * @return the filename of the generated report, or null if the member has no records
      */
     public String generateMemberReport(int memberNumber) {
+        return generateMemberReport(memberNumber, null);
+    }
+
+    public String generateMemberReport(int memberNumber, String outputDir) {
         Member member = memberDb.getMember(memberNumber);
         if (member == null) return null;
 
@@ -55,6 +61,7 @@ public class ReportGenerator {
 
         String dateStr = LocalDate.now().format(DATE_FORMAT);
         String filename = member.getName().replaceAll("\\s+", "_") + "_" + dateStr + ".txt";
+        if (outputDir != null) filename = outputDir + File.separator + filename;
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             writer.println("=== MEMBER REPORT ===");
@@ -93,6 +100,10 @@ public class ReportGenerator {
      * @return the filename of the generated report, or null if the provider has no records
      */
     public String generateProviderReport(int providerNumber) {
+        return generateProviderReport(providerNumber, null);
+    }
+
+    public String generateProviderReport(int providerNumber, String outputDir) {
         Provider provider = providerDb.getProvider(providerNumber);
         if (provider == null) return null;
 
@@ -101,6 +112,7 @@ public class ReportGenerator {
 
         String dateStr = LocalDate.now().format(DATE_FORMAT);
         String filename = provider.getName().replaceAll("\\s+", "_") + "_" + dateStr + ".txt";
+        if (outputDir != null) filename = outputDir + File.separator + filename;
 
         int totalConsultations = records.size();
         double totalFee = 0;
@@ -151,8 +163,13 @@ public class ReportGenerator {
      * @return the filename of the generated report
      */
     public String generateSummaryReport() {
+        return generateSummaryReport(null);
+    }
+
+    public String generateSummaryReport(String outputDir) {
         String dateStr = LocalDate.now().format(DATE_FORMAT);
         String filename = "SummaryReport_" + dateStr + ".txt";
+        if (outputDir != null) filename = outputDir + File.separator + filename;
 
         // Find all providers who provided services this week
         Set<Integer> activeProviders = new HashSet<>();
@@ -209,8 +226,13 @@ public class ReportGenerator {
      * @return the filename of the generated EFT file
      */
     public String generateEFTData() {
+        return generateEFTData(null);
+    }
+
+    public String generateEFTData(String outputDir) {
         String dateStr = LocalDate.now().format(DATE_FORMAT);
         String filename = "EFT_Data_" + dateStr + ".txt";
+        if (outputDir != null) filename = outputDir + File.separator + filename;
 
         // Calculate fees per provider
         Map<Integer, Double> providerFees = new HashMap<>();
@@ -244,7 +266,16 @@ public class ReportGenerator {
      * This runs at midnight on Friday or can be triggered manually by a manager.
      */
     public void runAccountingProcedure() {
+        runAccountingProcedureToFolder();
+    }
+
+    public String runAccountingProcedureToFolder() {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss"));
+        String folderName = "reports" + File.separator + "Accounting_Report_" + timestamp;
+        new File(folderName).mkdirs();
+
         System.out.println("\n=== RUNNING MAIN ACCOUNTING PROCEDURE ===");
+        System.out.println("Saving reports to: " + folderName);
 
         // Generate member reports for all members who received services
         Set<Integer> activeMemberNumbers = new HashSet<>();
@@ -254,7 +285,7 @@ public class ReportGenerator {
 
         System.out.println("Generating member reports...");
         for (int memberNum : activeMemberNumbers) {
-            String file = generateMemberReport(memberNum);
+            String file = generateMemberReport(memberNum, folderName);
             if (file != null) {
                 System.out.println("  Generated: " + file);
             }
@@ -268,7 +299,7 @@ public class ReportGenerator {
 
         System.out.println("Generating provider reports...");
         for (int provNum : activeProviderNumbers) {
-            String file = generateProviderReport(provNum);
+            String file = generateProviderReport(provNum, folderName);
             if (file != null) {
                 System.out.println("  Generated: " + file);
             }
@@ -276,18 +307,19 @@ public class ReportGenerator {
 
         // Generate summary report
         System.out.println("Generating summary report...");
-        String summaryFile = generateSummaryReport();
+        String summaryFile = generateSummaryReport(folderName);
         if (summaryFile != null) {
             System.out.println("  Generated: " + summaryFile);
         }
 
         // Generate EFT data
         System.out.println("Generating EFT data...");
-        String eftFile = generateEFTData();
+        String eftFile = generateEFTData(folderName);
         if (eftFile != null) {
             System.out.println("  Generated: " + eftFile);
         }
 
         System.out.println("=== ACCOUNTING PROCEDURE COMPLETE ===");
+        return folderName;
     }
 }
