@@ -518,28 +518,44 @@ public class ChocAnGUI extends JFrame {
             return;
         }
 
-        // Step 3: Service code
-        String codeInput = JOptionPane.showInputDialog(this,
-                "Enter service code (6 digits):", "Bill Service - Step 3", JOptionPane.PLAIN_MESSAGE);
-        if (codeInput == null) return;
+        // Step 3: Select service from clickable table
+        List<Service> allServices = serviceDir.getAllServicesSorted();
+        DefaultTableModel serviceModel = new DefaultTableModel(
+                new String[]{"Code", "Service Name", "Fee"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+        for (Service s : allServices) {
+            serviceModel.addRow(new Object[]{
+                    String.format("%06d", s.getCode()), s.getName(),
+                    String.format("$%.2f", s.getFee())
+            });
+        }
+        JTable serviceTable = new JTable(serviceModel);
+        serviceTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        styleTable(serviceTable);
+        serviceTable.setPreferredScrollableViewportSize(new Dimension(400, 200));
 
-        int serviceCode;
-        try {
-            serviceCode = Integer.parseInt(codeInput.trim());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Invalid service code.", "Error", JOptionPane.ERROR_MESSAGE);
+        JScrollPane tableScroll = new JScrollPane(serviceTable);
+        tableScroll.getViewport().setBackground(BAMA_GRAY);
+
+        int tableResult = JOptionPane.showConfirmDialog(this, tableScroll,
+                "Bill Service - Step 3: Select a Service", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (tableResult != JOptionPane.OK_OPTION) return;
+
+        int selectedRow = serviceTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "No service selected.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        Service service = serviceDir.getService(serviceCode);
-        if (service == null) {
-            JOptionPane.showMessageDialog(this, "Service code not found.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        int serviceCode = allServices.get(selectedRow).getCode();
+        Service service = allServices.get(selectedRow);
 
         // Step 4: Confirm service
         int confirm = JOptionPane.showConfirmDialog(this,
-                "Service: " + service.getName() + "\nFee: $" + String.format("%.2f", service.getFee()) +
+                "Service: " + service.getName() + "\nCode: " + String.format("%06d", service.getCode()) +
+                        "\nFee: $" + String.format("%.2f", service.getFee()) +
                         "\n\nIs this correct?",
                 "Confirm Service", JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) {
